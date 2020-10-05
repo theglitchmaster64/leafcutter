@@ -93,3 +93,15 @@ class Graph:
             return False
         else:
             return self.matrix[node1.index][node2.index]
+
+    def build_from_dict(self,dic,directed=False):
+        ''' build a graph from a dictionary adjacency list of the form {node0:[(wt,node1),(wt,node2),...etc],...etc}'''
+        if (len(self.nodes) != 0):
+            return 'graph is not empty'
+        else:
+            keys = list(dic.keys())
+            for key in keys:
+                self.add_node(GraphNode(str(key)))
+            for key in keys:
+                for item in dic[key]:
+                    self.add_link_by_name(name1=str(key),name2=str(item[1]),wt=int(item[0]),directed=directed)
