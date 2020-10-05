@@ -3,4 +3,4 @@
 __pycache__
 main.py
 test.py
-
+*.bin
