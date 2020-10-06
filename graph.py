@@ -105,3 +105,29 @@ class Graph:
             for key in keys:
                 for item in dic[key]:
                     self.add_link_by_name(name1=str(key),name2=str(item[1]),wt=int(item[0]),directed=directed)
+
+    def __repr__(self):
+        ret_str = ''
+        for i in range(0,self.vertices):
+            ret_str += '\t'+self.nodes[i].name
+        ret_str += '\n\n'
+        for i in range(0,self.vertices):
+            ret_str += self.nodes[i].name+'\t'
+            for j in range(0,self.vertices):
+                ret_str +=str(g.matrix[i][j])+'\t'
+            ret_str +='\n'
+        return ret_str
+
+    def get_neighbors(self,node):
+        for i in self.matrix[node.index]:
+            print(i)
+
+if __name__=='__main__':
+    g=Graph()
+    #dic = {'a':[(1,'b'),(2,'c'),(3,'d')],'b':[(1,'c'),(2,'d')],'c':[(7,'d')],'d':[(3,'a')]}
+    nodes = [GraphNode(s) for s in 'abcdef']
+    for node in nodes:
+        g.add_node(node)
+    links = [('a','b'),('b','c'),('c','d'),('e','f'),('f','a')]
+    for link in links:
+        g.add_link_by_name(*link,wt=2)
