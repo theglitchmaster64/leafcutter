@@ -7,6 +7,12 @@ class GraphNode:
         self.name = name
         self.data = data
 
+    def is_visited(self):
+        return self.visitor and self.visited
+
+    def mark_visited(self):
+        self.visited = not self.visited
+
     def __repr__(self):
         ret_str = {'index':self.index,'name':self.name,'data':str(self.data)}
         return str(ret_str)
@@ -18,6 +24,7 @@ class Graph:
         #0=linked to self, None=not linked
         self.matrix = [[None]*vertices]*vertices
         self.nodes = []
+        self.directed = False
 
     def grow_by_one(self):
         tmp_row = [None]*(len(self.matrix[0])+1)
@@ -38,6 +45,7 @@ class Graph:
         return True
 
     def add_link_by_index(self,index1,index2,wt=1,directed=False):
+        self.directed = directed
         if (index1 > self.top_index) or (index2 > self.top_index):
             return False
         else:
@@ -67,6 +75,12 @@ class Graph:
             return False
         else:
             return self.matrix[index1][index2]
+
+    def get_node_by_name(self,name):
+        for node in self.nodes:
+            if node.name == name:
+                return node
+        return None
 
     def get_link_by_name(self,name1,name2):
         index1 = None
@@ -118,16 +132,72 @@ class Graph:
             ret_str +='\n'
         return ret_str
 
-    def get_neighbors(self,node):
-        for i in self.matrix[node.index]:
-            print(i)
+    def get_neighbors(self,node=None):
+        nlist_index = []
+        nlist = []
+        if node==None:
+            try:
+                node = self.nodes[0]
+            except IndexError:
+                return 'graph has no nodes'
+        for i in range(0,self.vertices):
+            if self.matrix[node.index][i] != None and self.matrix[node.index][i] != 0:
+                nlist_index.append(i)
+        if self.directed == False:
+            for i in range(0,self.vertices):
+                if self.matrix[i][node.index] != None and self.matrix[i][node.index] != 0:
+                    nlist_index.append(i)
+        for node_index in list(set(nlist_index)):
+            nlist.append(self.nodes[node_index])
+        return nlist
+
+    def bfs(self,source=None):
+        visited = []
+        if source==None:
+            try:
+                source = self.nodes[0]
+            except IndexError:
+                return 'graph has no nodes'
+        Q = Queue()
+        Q.enqueue(source)
+        visited.append(source)
+        while(len(Q)>0):
+            vertex = Q.dequeue()
+            for node in self.get_neighbors(node=vertex):
+                if node not in visited:
+                    Q.enqueue(node)
+                    visited.append(node)
+        return visited
+
+    def dfs(self,source=None):
+        visited = []
+        if source==None:
+            try:
+                source = self.nodes[0]
+            except IndexError:
+                return 'graph has no nodes'
+        S = Stack()
+        S.push(source)
+        visited.append(source)
+        while(len(S)>0):
+            vertex = S.pop()
+            if vertex not in visited:
+                visited.append(vertex)
+            for node in self.get_neighbors(node=vertex):
+                if node not in visited:
+                    S.push(node)
+        return visited
+
+
+
+
 
 if __name__=='__main__':
     g=Graph()
     #dic = {'a':[(1,'b'),(2,'c'),(3,'d')],'b':[(1,'c'),(2,'d')],'c':[(7,'d')],'d':[(3,'a')]}
-    nodes = [GraphNode(s) for s in 'abcdef']
+    nodes = [GraphNode(s) for s in 'abcdefxyzt']
     for node in nodes:
         g.add_node(node)
-    links = [('a','b'),('b','c'),('c','d'),('e','f'),('f','a')]
+    links = [('a','b'),('a','c'),('c','d'),('c','e'),('e','f'),('b','x'),('x','y'),('d','z'),('y','t')]
     for link in links:
-        g.add_link_by_name(*link,wt=2)
+        g.add_link_by_name(*link,wt=2,directed=True)

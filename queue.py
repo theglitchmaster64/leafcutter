@@ -37,10 +37,7 @@ class Queue:
 	def populate(self,size,low=0.0,high=1.0,fx=float):
 		for i in range(0,size):
 			self.enqueue(fx(random.uniform(low,high)))
-		
+
 
 	def peek(self):
 		return self.array[self.front]
-
-
-
