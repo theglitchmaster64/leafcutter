@@ -1,5 +1,6 @@
 from queue import Queue
 from stack import Stack
+from heap import Heap
 
 class GraphNode:
     def __init__(self,name,data=None):
