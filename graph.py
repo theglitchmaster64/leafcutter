@@ -188,10 +188,12 @@ class Graph:
                     S.push(node)
         return visited
 
+    def dijkstra(self,source=None):
+        if source == None:
+            source = self.nodes[0]
+        
 
-
-
-
+#testing
 if __name__=='__main__':
     g=Graph()
     #dic = {'a':[(1,'b'),(2,'c'),(3,'d')],'b':[(1,'c'),(2,'d')],'c':[(7,'d')],'d':[(3,'a')]}
