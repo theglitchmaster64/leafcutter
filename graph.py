@@ -1,6 +1,10 @@
 from queue import Queue
 from stack import Stack
 from heap import Heap
+from router import RoutingObject, RoutingTable
+import copy
+
+INF = 9999999999
 
 class GraphNode:
     def __init__(self,name,data=None):
@@ -26,6 +30,7 @@ class Graph:
         self.matrix = [[None]*vertices]*vertices
         self.nodes = []
         self.directed = False
+        self.path_matrix = None
 
     def grow_by_one(self):
         tmp_row = [None]*(len(self.matrix[0])+1)
@@ -189,10 +194,60 @@ class Graph:
                     S.push(node)
         return visited
 
-    def dijkstra(self,source=None):
-        if source == None:
-            source = self.nodes[0]
-        
+    # build routing table using floyd warshall
+    def minimize_flwar(self):
+        soln_matrix = copy.deepcopy(self.matrix)
+        self.path_matrix = copy.deepcopy(self.matrix)
+
+        for i in range(0,self.vertices):
+            for j in range(0,self.vertices):
+                if (self.matrix[i][j] != None):
+                    self.path_matrix[i][j] = j
+                else:
+                    self.path_matrix[i][j] = None
+
+        for i in range(0,self.vertices):
+            for j in range(0,self.vertices):
+                current_dist = soln_matrix[i][j]
+                if current_dist == None:
+                    current_dist = int(INF)
+
+                for k in range(0,self.vertices):
+
+                    current_dist = soln_matrix[i][j]
+                    if current_dist == None:
+                        current_dist = int(INF)
+                    dist1 = soln_matrix[i][k]
+                    dist2 = soln_matrix[k][j]
+                    if dist1 == None:
+                        dist1 = int(INF)
+                    if dist2 == None:
+                        dist2 = int(INF)
+                    new_dist = dist1 + dist2
+
+                    if new_dist < current_dist:
+                        print('dist from {} to {} through {} is {}'.format(self.nodes[i].name,self.nodes[j].name,self.nodes[k].name,new_dist))
+                        soln_matrix[i][j] = new_dist
+                        self.path_matrix[i][j] = self.path_matrix[i][k]
+                        
+        return soln_matrix
+
+    def get_path_by_index(self,source_index,dest_index):
+        path = []
+        if self.path_matrix == None:
+            return None
+        else:
+            while source_index != dest_index:
+                source_index = self.path_matrix[source_index][dest_index]
+                path.append(self.nodes[source_index])
+        return path
+
+    def get_path(self,source,dest):
+        return self.get_path_by_index(source.index,dest.index)
+
+    def get_path_by_name(self,source_name,dest_name):
+        return self.get_path(self.get_node_by_name(source_name),self.get_node_by_name(dest_name))
+
 
 #testing
 if __name__=='__main__':
@@ -203,4 +258,4 @@ if __name__=='__main__':
         g.add_node(node)
     links = [('a','b'),('a','c'),('c','d'),('c','e'),('e','f'),('b','x'),('x','y'),('d','z'),('y','t')]
     for link in links:
-        g.add_link_by_name(*link,wt=2,directed=True)
+        g.add_link_by_name(*link,wt=2,directed=False)
